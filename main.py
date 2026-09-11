@@ -28,4 +28,18 @@ quest_list = tk.Listbox(
 )
 quest_list.pack()
 
+def complete_quest():
+    selected = quest_list.curselection()
+
+    if selected:
+        index = selected[0]
+        quest_list.delete(index)
+
+complete_button = tk.Button(
+    window,
+    text= "Completed",
+    command= complete_quest,
+)
+complete_button.pack()
+
 window.mainloop()
