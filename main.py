@@ -7,6 +7,23 @@ window.geometry("500x500")
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
+xp = 0
+level = 1
+
+xp_label = ctk.CTkLabel(
+    window,
+    text="⭐ XP : 0",
+    font=("Arial", 20, "bold")
+)
+xp_label.pack(pady=10)
+
+level_label = ctk.CTkLabel(
+    window,
+    text="🏆 Level : 1",
+    font=("Arial", 18, "bold")
+)
+level_label.pack()
+
 quest_entry = ctk.CTkEntry(
     window,
     width=400,
@@ -17,6 +34,21 @@ def delete_quest(quest_card):
     quest_card.destroy()
 
 def complete_quest(quest_label, complete_button, delete_button):
+    global xp, level
+
+    xp += 10
+
+    if xp >= level * 100:
+        level += 1
+
+    xp_label.configure(
+        text=f"⭐ XP : {xp}"
+    )
+
+    level_label.configure(
+        text=f"🏆 Level : {level}"
+    )
+
     quest_label.configure(
         text="✓ " + quest_label.cget("text"),
         font=("Arial", 14, "italic", "overstrike")
