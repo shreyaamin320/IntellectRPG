@@ -30,13 +30,29 @@ quest_entry = ctk.CTkEntry(
 )
 quest_entry.pack()
 
+difficulty = ctk.StringVar(value="Medium")
+
+difficulty_menu = ctk.CTkOptionMenu(
+    window,
+    variable=difficulty,
+    values=["Easy", "Medium", "Hard"]
+)
+difficulty_menu.pack(pady=5)
+
 def delete_quest(quest_card):
     quest_card.destroy()
 
-def complete_quest(quest_label, complete_button, delete_button):
+def complete_quest(quest_label, complete_button, delete_button, selected_difficulty):
     global xp, level
 
-    xp += 10
+    if selected_difficulty == "Easy":
+        xp += 10
+
+    elif selected_difficulty == "Medium":
+        xp += 25
+
+    elif selected_difficulty == "Hard":
+        xp += 50
 
     if xp >= level * 100:
         level += 1
@@ -65,13 +81,14 @@ def complete_quest(quest_label, complete_button, delete_button):
 
 def add_quest():
     quest = quest_entry.get()
+    selected_difficulty = difficulty.get()
 
     quest_card = ctk.CTkFrame(quest_frame)
     quest_card.pack(fill="x", padx=10, pady=5)
 
     quest_label = ctk.CTkLabel(
         quest_card,
-        text=quest,
+        text=f"{quest} [{selected_difficulty}]",
     )
     quest_label.pack(side="left", padx=10, pady=10)
 
@@ -89,7 +106,8 @@ def add_quest():
         command=lambda: complete_quest(
             quest_label,
             complete_button,
-            delete_button
+            delete_button,
+            selected_difficulty,
     ),
 )
     complete_button.pack(side="right", padx=10, pady=10)
