@@ -24,15 +24,16 @@ More features will be added as development continues.
 
 - Python
 - Tkinter
+- CustomTkinter
 
 ## 📌 Current Progress
 
 - [x] Basic application window
-- [ ] Quest creation
-- [ ] Quest list
-- [ ] Quest completion
-- [ ] XP system
-- [ ] Level system
-- [ ] Difficulty system
+- [x] Quest creation
+- [x] Quest list
+- [x] Quest completion
+- [x] XP system
+- [x] Level system
+- [x] Difficulty system
 - [ ] Progress tracking
 - [ ] UI polish
