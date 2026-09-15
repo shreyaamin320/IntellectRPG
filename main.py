@@ -51,17 +51,36 @@ quest_type_menu.pack(pady=5)
 def delete_quest(quest_card):
     quest_card.destroy()
 
-def complete_quest(quest_label, complete_button, delete_button, selected_difficulty):
+def complete_quest(
+    quest_label,
+    complete_button,
+    delete_button,
+    selected_difficulty,
+    selected_quest_type
+):
     global xp, level
 
-    if selected_difficulty == "Easy":
-        xp += 10
+    if selected_quest_type == "Main Quest":
 
-    elif selected_difficulty == "Medium":
-        xp += 25
+        if selected_difficulty == "Easy":
+            xp += 20
 
-    elif selected_difficulty == "Hard":
-        xp += 50
+        elif selected_difficulty == "Medium":
+            xp += 30
+
+        elif selected_difficulty == "Hard":
+            xp += 40
+
+    elif selected_quest_type == "Side Quest":
+
+        if selected_difficulty == "Easy":
+            xp += 10
+
+        elif selected_difficulty == "Medium":
+            xp += 15
+
+        elif selected_difficulty == "Hard":
+            xp += 20
 
     xp_progress.set((xp % 100) / 100)
 
@@ -71,7 +90,7 @@ def complete_quest(quest_label, complete_button, delete_button, selected_difficu
     xp_label.configure(
         text=f"⭐ XP : {xp}"
     )
-    
+
     level_label.configure(
         text=f"🏆 Level : {level}"
     )
@@ -110,7 +129,7 @@ def add_quest():
         width=40,
         command=lambda: delete_quest(quest_card),
     )
-    delete_button.pack(side="right" , padx=5, pady=10)
+    delete_button.pack(side="right", padx=5, pady=10)
 
     complete_button = ctk.CTkButton(
         quest_card,
@@ -120,8 +139,9 @@ def add_quest():
             complete_button,
             delete_button,
             selected_difficulty,
-    ),
-)
+            selected_quest_type,
+        ),
+    )
     complete_button.pack(side="right", padx=10, pady=10)
 
     quest_entry.delete(0, tk.END)
