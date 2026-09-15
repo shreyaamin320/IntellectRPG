@@ -39,6 +39,15 @@ difficulty_menu = ctk.CTkOptionMenu(
 )
 difficulty_menu.pack(pady=5)
 
+quest_type = ctk.StringVar(value="Main Quest")
+
+quest_type_menu = ctk.CTkOptionMenu(
+    window,
+    variable=quest_type,
+    values=["Main Quest", "Side Quest"]
+)
+quest_type_menu.pack(pady=5)
+
 def delete_quest(quest_card):
     quest_card.destroy()
 
@@ -84,13 +93,14 @@ def complete_quest(quest_label, complete_button, delete_button, selected_difficu
 def add_quest():
     quest = quest_entry.get()
     selected_difficulty = difficulty.get()
+    selected_quest_type = quest_type.get()
 
     quest_card = ctk.CTkFrame(quest_frame)
     quest_card.pack(fill="x", padx=10, pady=5)
 
     quest_label = ctk.CTkLabel(
         quest_card,
-        text=f"{quest} [{selected_difficulty}]",
+        text=f"{quest} [{selected_quest_type}] [{selected_difficulty}]",
     )
     quest_label.pack(side="left", padx=10, pady=10)
 
