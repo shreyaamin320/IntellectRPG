@@ -54,13 +54,15 @@ def complete_quest(quest_label, complete_button, delete_button, selected_difficu
     elif selected_difficulty == "Hard":
         xp += 50
 
+    xp_progress.set((xp % 100) / 100)
+
     if xp >= level * 100:
         level += 1
 
     xp_label.configure(
         text=f"⭐ XP : {xp}"
     )
-
+    
     level_label.configure(
         text=f"🏆 Level : {level}"
     )
@@ -113,6 +115,15 @@ def add_quest():
     complete_button.pack(side="right", padx=10, pady=10)
 
     quest_entry.delete(0, tk.END)
+
+xp_progress = ctk.CTkProgressBar(
+        window,
+        width=400,
+        height=15,
+        fg_color= "grey"
+    )
+xp_progress.pack(pady=10)
+xp_progress.set(0)
 
 add_button = ctk.CTkButton(
     window,
