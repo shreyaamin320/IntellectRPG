@@ -17,6 +17,10 @@ achievement_window = None
 study_streak = 0
 last_study_date = None
 
+main_quests_completed = 0
+side_quests_completed = 0
+subject_counts = {}
+
 achievements = {
     "First Quest": False,
     "Quest Grinder": False,
@@ -287,7 +291,7 @@ def show_achievements():
         "title": "Rising Hero",
         "description": "Reach Level 2"
     }
-}
+    }
 
     for achievement, unlocked in achievements.items():
 
@@ -341,6 +345,119 @@ def show_achievements():
             pady=(2, 10)
         )
 
+def show_statistics():
+
+    statistics_window = ctk.CTkToplevel(window)
+    statistics_window.title("Statistics")
+    statistics_window.geometry("500x600")
+
+    statistics_frame = ctk.CTkScrollableFrame(
+        statistics_window,
+        width=450,
+        height=520
+    )
+    statistics_frame.pack(
+        padx=15,
+        pady=10,
+        fill="both",
+        expand=True
+    )
+
+    title_label = ctk.CTkLabel(
+        statistics_frame,
+        text="Statistics",
+        font=("Arial", 24, "bold")
+    )
+    title_label.pack(pady=15)
+
+    total_quests_label = ctk.CTkLabel(
+        statistics_frame,
+        text=f"Total Quests Completed : {completed_quests}",
+        font=("Arial", 16)
+    )
+    total_quests_label.pack(pady=8)
+
+    total_xp_label = ctk.CTkLabel(
+        statistics_frame,
+        text=f"Total XP Earned : {xp}",
+        font=("Arial", 16)
+    )
+    total_xp_label.pack(pady=8)
+
+    level_stats_label = ctk.CTkLabel(
+        statistics_frame,
+        text=f"Current Level : {level}",
+        font=("Arial", 16)
+    )
+    level_stats_label.pack(pady=8)
+
+    streak_stats_label = ctk.CTkLabel(
+        statistics_frame,
+        text=f"Current Streak : {study_streak} days",
+        font=("Arial", 16)
+    )
+    streak_stats_label.pack(pady=8)
+
+    main_quest_label = ctk.CTkLabel(
+        statistics_frame,
+        text=f"Main Quests : {main_quests_completed}",
+        font=("Arial", 16)
+    )
+    main_quest_label.pack(pady=8)
+
+    side_quest_label = ctk.CTkLabel(
+        statistics_frame,
+        text=f"Side Quests : {side_quests_completed}",
+        font=("Arial", 16)
+    )
+    side_quest_label.pack(pady=8)
+
+    subject_title = ctk.CTkLabel(
+        statistics_frame,
+        text="Subject Activity",
+        font=("Arial", 18, "bold")
+    )
+    subject_title.pack(pady=15)
+
+    if subject_counts:
+
+        for subject_name, count in subject_counts.items():
+
+            subject_label = ctk.CTkLabel(
+            statistics_frame,
+            text=f"{subject_name} : {count} quests",
+            font=("Arial", 14),
+            )
+            subject_label.pack(pady=3)
+
+    else:
+        no_subjects_label = ctk.CTkLabel(
+            statistics_frame,
+            text="No completed quests yet.",
+            font=("Arial", 14),
+        )
+        no_subjects_label.pack(pady=5)
+
+    if subject_counts:
+
+        most_studied_subject = max(
+            subject_counts,
+            key=subject_counts.get,
+        )   
+
+    most_studied_count = subject_counts[most_studied_subject]
+
+    most_studied_label = ctk.CTkLabel(
+        statistics_frame,
+        text=(
+            f"🏆 Most Studied Subject : "
+            f"{most_studied_subject} "
+            f"({most_studied_count} quests)"
+        ),
+        font=("Arial", 16, "bold")
+    )
+    most_studied_label.pack(pady=15)
+
 def update_level():
     global level
 
@@ -376,9 +493,12 @@ def complete_quest(
     complete_button,
     delete_button,
     selected_difficulty,
-    selected_quest_type
+    selected_quest_type,
+    selected_subject,
  ):
     global xp, completed_quests
+    global main_quests_completed, side_quests_completed
+    global subject_counts
 
     if selected_quest_type == "Main Quest":
 
@@ -405,6 +525,16 @@ def complete_quest(
     xp_label.configure(
         text=f"XP : {xp}"
     )
+
+    if selected_quest_type == "Main Quest":
+        main_quests_completed += 1
+    elif selected_quest_type == "Side Quest":
+        side_quests_completed += 1
+
+    if selected_subject not in subject_counts:
+        subject_counts[selected_subject] = 0
+
+    subject_counts[selected_subject] += 1
 
     update_level()
 
@@ -464,6 +594,7 @@ def add_quest():
             delete_button,
             selected_difficulty,
             selected_quest_type,
+            selected_subject,
         ),
     )
     complete_button.pack(side="right", padx=10, pady=10)
@@ -492,6 +623,13 @@ achievements_button = ctk.CTkButton(
     command = show_achievements,
 )
 achievements_button.pack(pady=5)
+
+statistics_button = ctk.CTkButton(
+    window,
+    text="Statistics",
+    command=show_statistics,
+)
+statistics_button.pack(pady=5)
 
 quest_frame = ctk.CTkScrollableFrame(
     window,
