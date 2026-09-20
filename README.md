@@ -37,17 +37,17 @@ The goal is to make studying feel more rewarding, motivating, and fun.
 ## Planned Features
 
 ### RPG Progression
-- [ ] Improved level progression and XP requirements
-- [ ] Level-up celebrations
+- [x] Improved level progression and XP requirements
+- [x] Level-up celebrations
 - [ ] Achievement system with badges/medals
 - [ ] Statistics dashboard
 - [ ] Study streak system
 
 ### Quest System
-- [ ] Main Quest and Side Quest types
-- [ ] Let users choose the quest type
-- [ ] Different rewards for Main Quests and Side Quests
-- [ ] Better quest organization
+- [x] Main Quest and Side Quest types
+- [x] Let users choose the quest type
+- [x] Different rewards for Main Quests and Side Quests
+- [x] Better quest organization
 
 ### Study Tracking
 - [ ] Subject/category system
