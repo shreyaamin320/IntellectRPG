@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import tkinter as tk
+from datetime import date
 window = ctk.CTk()
 window.title("IntellectRPG")
 window.geometry("500x500")
@@ -12,6 +13,9 @@ level = 1
 
 completed_quests = 0
 achievement_window = None
+
+study_streak = 0
+last_study_date = None
 
 achievements = {
     "First Quest": False,
@@ -34,6 +38,13 @@ level_label = ctk.CTkLabel(
     font=("Arial", 18, "bold")
 )
 level_label.pack(pady=10)
+
+streak_label = ctk.CTkLabel(
+    window,
+    text="Streak : 0 ",
+    font=("Arial", 16, "bold")
+)
+streak_label.pack(pady=5)
 
 level_up_label = ctk.CTkLabel(
     window, 
@@ -194,6 +205,29 @@ def check_achievements():
 
     if level >= 2:
         achievements["Level Up!"] = True
+
+def update_streak():
+    global study_streak, last_study_date
+
+    today = date.today()
+
+    if last_study_date is None:
+        study_streak = 1
+
+    elif today == last_study_date:
+        return
+
+    elif( today - last_study_date).days == 1:
+        study_streak += 1
+
+    else:
+        study_streak = 1
+
+    last_study_date = today
+
+    streak_label.configure(
+    text=f"Streak : {study_streak} "
+    )
 
 def show_achievements():
     global achievement_window
@@ -375,6 +409,8 @@ def complete_quest(
     update_level()
 
     completed_quests += 1
+
+    update_streak()
 
     check_achievements()
 
