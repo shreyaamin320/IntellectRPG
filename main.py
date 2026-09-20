@@ -206,7 +206,7 @@ def show_achievements():
 
     title = ctk.CTkLabel(
         achievement_window,
-        text="🏆 ACHIEVEMENTS",
+        text="ACHIEVEMENTS",
         font=("Arial", 24, "bold")
     )
     title.pack(pady=20)
@@ -224,31 +224,42 @@ def show_achievements():
     )
 
     achievement_details = {
-        "First Quest": (
-            "⚔️",
-            "Complete your first quest"
-        ),
-        "Quest Grinder": (
-            "🔥",
-            "Complete 5 quests"
-        ),
-        "Getting Serious": (
-            "💪",
-            "Complete 10 quests"
-        ),
-        "XP Hunter": (
-            "⭐",
-            "Earn 100 XP"
-        ),
-        "Level Up!": (
-            "🏆",
-            "Reach Level 2"
-        )
+    "First Quest": {
+        "badge": "🥉",
+        "title": "Rookie Adventurer",
+        "description": "Complete your first quest"
+    },
+
+    "Quest Grinder": {
+        "badge": "🥈",
+        "title": "Quest Grinder",
+        "description": "Complete 5 quests"
+    },
+
+    "Getting Serious": {
+        "badge": "🥇",
+        "title": "Dedicated Adventurer",
+        "description": "Complete 10 quests"
+    },
+
+    "XP Hunter": {
+        "badge": "💎",
+        "title": "XP Hunter",
+        "description": "Earn 100 XP"
+    },
+
+    "Level Up!": {
+        "badge": "🏆",
+        "title": "Rising Hero",
+        "description": "Reach Level 2"
     }
+}
 
     for achievement, unlocked in achievements.items():
 
-        icon, description = achievement_details[achievement]
+        badge = achievement_details [achievement] ["badge"]
+        title = achievement_details [achievement] ["title"]
+        description = achievement_details [achievement] ["description"]
 
         achievement_card = ctk.CTkFrame(
             achievement_frame
@@ -261,7 +272,7 @@ def show_achievements():
 
         name_label = ctk.CTkLabel(
             achievement_card,
-            text=f"{icon} {achievement}",
+            text=f"{badge} {title}",
             font=("Arial", 16, "bold")
         )
         name_label.pack(
