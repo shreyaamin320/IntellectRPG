@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import tkinter as tk
 from datetime import date
+import json
 window = ctk.CTk()
 window.title("IntellectRPG")
 window.geometry("500x500")
@@ -21,6 +22,8 @@ main_quests_completed = 0
 side_quests_completed = 0
 subject_counts = {}
 
+quests = []
+
 achievements = {
     "First Quest": False,
     "Quest Grinder": False,
@@ -28,6 +31,80 @@ achievements = {
     "XP Hunter": False,
     "Level Up!": False
 }
+
+def save_progress():
+    data = {
+        "xp" : xp,
+        "level" : level,
+        "completed_quests" : completed_quests,
+        "main_quests_completed" : main_quests_completed,
+        "side_quests_completed" : side_quests_completed,
+        "subject_counts" : subject_counts,
+        "study_streak" : study_streak,
+        "last_study_date" : (
+            last_study_date.isoformat()
+            if last_study_date is not None 
+            else None
+        ),
+        "achievements" : achievements,
+        "quests" : quests,
+    }
+
+    with open("save_data.json" , "w") as file:
+        json.dump(data, file, indent=4)
+
+def load_progress():
+
+    global xp, level
+    global completed_quests
+    global main_quests_completed, side_quests_completed
+    global subject_counts
+    global study_streak, last_study_date
+    global achievements
+    global quests
+
+    try:
+
+        with open("save_data.json", "r") as file:
+            data = json.load(file)
+
+        xp = data.get("xp", 0)
+        level = data.get("level", 1)
+
+        completed_quests = data.get( "completed_quests", 0)
+
+        main_quests_completed = data.get("main_quests_completed", 0)
+
+        side_quests_completed = data.get( "side_quests_completed", 0)
+
+        subject_counts = data.get("subject_counts", {})
+
+        quests = data.get("quests" , [])
+
+        study_streak = data.get( "study_streak", 0)
+
+        saved_date = data.get("last_study_date")
+
+        if saved_date is not None:
+            last_study_date = date.fromisoformat(saved_date)
+
+            today = date.today()
+
+            if( today - last_study_date).days > 1:
+                study_streak = 0
+
+        else:
+            last_study_date = None
+
+        saved_achievements = data.get("achievements", {})
+
+        for achievement_name in achievements:
+
+            if achievement_name in saved_achievements:
+                achievements[achievement_name] = (saved_achievements[achievement_name])
+
+    except FileNotFoundError:
+        pass
 
 xp_label = ctk.CTkLabel(
     window,
@@ -176,8 +253,15 @@ filter_menu = ctk.CTkOptionMenu(
 
 filter_menu.pack(pady=5)
 
-def delete_quest(quest_card):
+def delete_quest(quest_card , quest_data):
+
+    if quest_data in quests:
+        quests.remove(quest_data)
+
     quest_card.destroy()
+
+    save_progress()
+    
 
 def xp_required_for_level(level):
     return 100 * level * (level - 1) // 2
@@ -450,7 +534,7 @@ def show_statistics():
     most_studied_label = ctk.CTkLabel(
         statistics_frame,
         text=(
-            f"🏆 Most Studied Subject : "
+            f"Most Studied Subject : "
             f"{most_studied_subject} "
             f"({most_studied_count} quests)"
         ),
@@ -495,10 +579,13 @@ def complete_quest(
     selected_difficulty,
     selected_quest_type,
     selected_subject,
+    quest_data,
  ):
     global xp, completed_quests
     global main_quests_completed, side_quests_completed
     global subject_counts
+
+    quest_data["completed"] = True
 
     if selected_quest_type == "Main Quest":
 
@@ -558,48 +645,134 @@ def complete_quest(
         state="disabled"
     )
 
-def add_quest():
-    quest = quest_entry.get()
-    selected_difficulty = difficulty.get()
-    selected_quest_type = quest_type.get()
-    selected_subject = subject.get()
+    save_progress()
 
-    quest_card = ctk.CTkFrame(quest_frame)
+def create_quest_card(
+    quest_text,
+    selected_difficulty,
+    selected_quest_type,
+    selected_subject,
+    completed=False,
+    quest_data = None,
+):
+
+    quest_card = ctk.CTkFrame(
+        quest_frame
+    )
 
     quest_card.quest_type_value = selected_quest_type
     quest_card.subject_value = selected_subject
 
-    quest_card.pack(fill="x", padx=10, pady=5)
+    quest_card.pack(
+        fill="x",
+        padx=10,
+        pady=5
+    )
 
     quest_label = ctk.CTkLabel(
         quest_card,
-        text=f"{quest}  [{selected_quest_type}]  [{selected_difficulty}]  [{selected_subject}]",
+        text=(
+            f"{quest_text}  "
+            f"[{selected_quest_type}]  "
+            f"[{selected_difficulty}]  "
+            f"[{selected_subject}]"
+        )
     )
-    quest_label.pack(side="left", padx=10, pady=10)
+    quest_label.pack(
+        side="left",
+        padx=10,
+        pady=10
+    )
 
     delete_button = ctk.CTkButton(
         quest_card,
         text="✕",
         width=40,
-        command=lambda: delete_quest(quest_card),
+        command = lambda: delete_quest(quest_card, quest_data),
     )
-    delete_button.pack(side="right", padx=5, pady=10)
+    delete_button.pack(
+        side="right",
+        padx=5,
+        pady=10
+    )
 
     complete_button = ctk.CTkButton(
         quest_card,
-        text="✓ Complete",
-        command=lambda: complete_quest(
-            quest_label,
-            complete_button,
-            delete_button,
-            selected_difficulty,
-            selected_quest_type,
-            selected_subject,
-        ),
+        text="✓ Complete"
     )
-    complete_button.pack(side="right", padx=10, pady=10)
+    complete_button.pack(
+        side="right",
+        padx=10,
+        pady=10
+    )
 
-    quest_entry.delete(0, tk.END)
+    if completed:
+
+        quest_label.configure(
+            text="✓ " + quest_label.cget("text"),
+            font=("Arial", 14, "italic", "overstrike")
+        )
+
+        complete_button.configure(
+            text="Completed!",
+            state="disabled"
+        )
+
+        delete_button.configure(
+            state="disabled"
+        )
+
+    else:
+
+        complete_button.configure(
+            command=lambda: complete_quest(
+                quest_label,
+                complete_button,
+                delete_button,
+                selected_difficulty,
+                selected_quest_type,
+                selected_subject,
+                quest_data,
+            )
+        )
+
+        delete_button.configure(
+            command=lambda: delete_quest(quest_card, quest_data)
+        )
+
+    return quest_card
+
+def add_quest():
+
+    quest_text = quest_entry.get()
+    selected_difficulty = difficulty.get()
+    selected_quest_type = quest_type.get()
+    selected_subject = subject.get()
+
+    quest_data = {
+        "text": quest_text,
+        "difficulty": selected_difficulty,
+        "quest_type": selected_quest_type,
+        "subject": selected_subject,
+        "completed": False
+    }
+
+    quests.append(quest_data)
+
+    create_quest_card(
+        quest_text,
+        selected_difficulty,
+        selected_quest_type,
+        selected_subject,
+        quest_data = quest_data
+    )
+
+    quest_entry.delete(
+        0,
+        tk.END
+    )
+
+    save_progress()
 
 xp_progress = ctk.CTkProgressBar(
         window,
@@ -631,6 +804,13 @@ statistics_button = ctk.CTkButton(
 )
 statistics_button.pack(pady=5)
 
+save_button = ctk.CTkButton(
+    window,
+    text="Save Progress",
+    command=save_progress
+)
+save_button.pack(pady=5)
+
 quest_frame = ctk.CTkScrollableFrame(
     window,
     width = 450,
@@ -642,5 +822,32 @@ quest_frame.pack(
     fill="both",
     expand=True,
 )
+
+load_progress()
+
+xp_label.configure(
+    text=f"XP : {xp}"
+)
+
+level_label.configure(
+    text=f"Level : {level}"
+)
+
+streak_label.configure(
+    text=f"Streak : {study_streak}"
+)
+
+update_level()
+
+for quest_data in quests:
+
+    create_quest_card(
+        quest_data["text"],
+        quest_data["difficulty"],
+        quest_data["quest_type"],
+        quest_data["subject"],
+        quest_data["completed"],
+        quest_data
+    )
 
 window.mainloop()
