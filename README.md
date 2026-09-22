@@ -39,9 +39,9 @@ The goal is to make studying feel more rewarding, motivating, and fun.
 ### RPG Progression
 - [x] Improved level progression and XP requirements
 - [x] Level-up celebrations
-- [ ] Achievement system with badges/medals
-- [ ] Statistics dashboard
-- [ ] Study streak system
+- [x] Achievement system with badges/medals
+- [x] Statistics dashboard
+- [x] Study streak system
 
 ### Quest System
 - [x] Main Quest and Side Quest types
@@ -50,9 +50,9 @@ The goal is to make studying feel more rewarding, motivating, and fun.
 - [x] Better quest organization
 
 ### Study Tracking
-- [ ] Subject/category system
-- [ ] Better study-focused quest organization
-- [ ] Save and load progress
+- [x] Subject/category system
+- [x] Better study-focused quest organization
+- [x] Save and load progress
 
 ### Knight Cat Companion
 - [ ] Knight cat companion
