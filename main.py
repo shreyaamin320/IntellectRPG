@@ -4,7 +4,8 @@ from datetime import date
 import json
 window = ctk.CTk()
 window.title("IntellectRPG")
-window.geometry("500x500")
+window.geometry("1000x700")
+window.minsize(900, 650)
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
@@ -106,62 +107,314 @@ def load_progress():
     except FileNotFoundError:
         pass
 
-xp_label = ctk.CTkLabel(
+def filter_quests(selected_filter):
+        for quest_card in quest_frame.winfo_children():
+
+            quest_type_value = quest_card.quest_type_value
+            subject_value = quest_card.subject_value
+
+            if selected_filter == "All":
+                quest_card.pack(fill="x", padx=10, pady=5)
+
+            elif selected_filter == quest_type_value:
+                quest_card.pack(fill="x", padx=10, pady=5)
+
+            elif selected_filter == subject_value:
+                quest_card.pack(fill="x", padx=10, pady=5)
+
+            else:
+                quest_card.pack_forget()
+
+# MAIN UI LAYOUT
+
+# TOP HEADER
+
+header_frame = ctk.CTkFrame(
     window,
-    text="XP : 0",
-    font=("Arial", 20, "bold")
+    height=80
 )
-xp_label.pack(pady=10)
+header_frame.pack(
+    fill="x",
+    padx=15,
+    pady=(15, 10)
+)
+
+title_label = ctk.CTkLabel(
+    header_frame,
+    text="INTELLECTRPG",
+    font=("Arial", 24, "bold")
+)
+title_label.pack(
+    side="left",
+    padx=20,
+    pady=15
+)
+
+level_up_label = ctk.CTkLabel(
+    header_frame,
+    text="",
+    font=("Arial", 14, "bold")
+)
+level_up_label.pack(
+    side="left",
+    padx=20
+)
+
+xp_label = ctk.CTkLabel(
+    header_frame,
+    text="XP : 0",
+    font=("Arial", 18, "bold")
+)
+xp_label.pack(
+    side="right",
+    padx=20
+)
 
 level_label = ctk.CTkLabel(
-    window,
+    header_frame,
     text="Level : 1",
     font=("Arial", 18, "bold")
 )
-level_label.pack(pady=10)
+level_label.pack(
+    side="right",
+    padx=20
+)
 
 streak_label = ctk.CTkLabel(
-    window,
-    text="Streak : 0 ",
+    header_frame,
+    text="Streak : 0",
     font=("Arial", 16, "bold")
 )
-streak_label.pack(pady=5)
-
-level_up_label = ctk.CTkLabel(
-    window, 
-    text="",
-    font = ("Arial" , 18, "bold"),
+streak_label.pack(
+    side="right",
+    padx=20
 )
-level_up_label.pack(pady=5)
+
+# MAIN AREA
+
+main_area = ctk.CTkFrame(
+    window,
+    fg_color="transparent"
+)
+main_area.pack(
+    fill="both",
+    expand=True,
+    padx=15,
+    pady=5
+)
+
+
+# LEFT SIDEBAR
+
+sidebar_frame = ctk.CTkFrame(
+    main_area,
+    width=220
+)
+sidebar_frame.pack(
+    side="left",
+    fill="y",
+    padx=(0, 10)
+)
+
+companion_title = ctk.CTkLabel(
+    sidebar_frame,
+    text="COMPANION",
+    font=("Arial", 18, "bold")
+)
+companion_title.pack(
+    pady=(25, 10)
+)
+
+# CROOKSHANKS (KNIGHT CAT)
+
+cat_frame = ctk.CTkFrame(
+    sidebar_frame,
+    fg_color="transparent"
+)
+cat_frame.pack(
+    fill="x",
+    padx=15,
+    pady=10
+)
+
+cat_art = ctk.CTkLabel(
+    cat_frame,
+    text="🐱⚔️",
+    font=("Arial", 52)
+)
+cat_art.pack(
+    pady=(10, 5)
+)
+
+cat_name = ctk.CTkLabel(
+    cat_frame,
+    text="Crookshanks",
+    font=("Arial", 18, "bold")
+)
+cat_name.pack(
+    pady=5
+)
+
+cat_dialogue_frame = ctk.CTkFrame(
+    cat_frame
+)
+cat_dialogue_frame.pack(
+    fill="x",
+    padx=5,
+    pady=10
+)
+
+cat_dialogue = ctk.CTkLabel(
+    cat_dialogue_frame,
+    text="Hooman, ready for a quest?",
+    font=("Arial", 13),
+    wraplength=180,
+    justify="center"
+)
+cat_dialogue.pack(
+    padx=12,
+    pady=12
+)
+
+cat_treats = ctk.CTkLabel(
+    cat_frame,
+    text="Treats: 0",
+    font=("Arial", 13, "bold")
+)
+cat_treats.pack(
+    pady=5
+)
+
+sidebar_separator = ctk.CTkFrame(
+    sidebar_frame,
+    height=2
+)
+sidebar_separator.pack(
+    fill="x",
+    padx=25,
+    pady=20
+)
+
+achievements_button = ctk.CTkButton(
+    sidebar_frame,
+    text="Achievements",
+    command=lambda: show_achievements()
+)
+achievements_button.pack(
+    fill="x",
+    padx=20,
+    pady=5
+)
+
+statistics_button = ctk.CTkButton(
+    sidebar_frame,
+    text="Statistics",
+    command=lambda: show_statistics()
+)
+statistics_button.pack(
+    fill="x",
+    padx=20,
+    pady=5
+)
+
+save_button = ctk.CTkButton(
+    sidebar_frame,
+    text="Save Progress",
+    command=save_progress
+)
+save_button.pack(
+    fill="x",
+    padx=20,
+    pady=5
+)
+
+
+# RIGHT SIDE
+
+right_area = ctk.CTkFrame(
+    main_area,
+    fg_color="transparent"
+)
+right_area.pack(
+    side="left",
+    fill="both",
+    expand=True
+)
+
+
+# QUEST BOARD
+
+quest_board = ctk.CTkFrame(
+    right_area
+)
+quest_board.pack(
+    fill="x",
+    pady=(0, 10)
+)
+
+quest_board_title = ctk.CTkLabel(
+    quest_board,
+    text="QUEST BOARD",
+    font=("Arial", 20, "bold")
+)
+quest_board_title.pack(
+    pady=(15, 10)
+)
+
 
 quest_entry = ctk.CTkEntry(
-    window,
-    width=400,
+    quest_board,
+    width=500,
+    height=40,
+    placeholder_text="What quest are we undertaking?"
 )
-quest_entry.pack()
+quest_entry.pack(
+    pady=10
+)
+
+
+# QUEST OPTIONS
+
+options_frame = ctk.CTkFrame(
+    quest_board,
+    fg_color="transparent"
+)
+options_frame.pack(
+    pady=5
+)
 
 difficulty = ctk.StringVar(value="Medium")
 
 difficulty_menu = ctk.CTkOptionMenu(
-    window,
+    options_frame,
     variable=difficulty,
-    values=["Easy", "Medium", "Hard"]
+    values=["Easy", "Medium", "Hard"],
+    width=160
 )
-difficulty_menu.pack(pady=5)
+difficulty_menu.pack(
+    side="left",
+    padx=5
+)
+
 
 quest_type = ctk.StringVar(value="Main Quest")
 
 quest_type_menu = ctk.CTkOptionMenu(
-    window,
+    options_frame,
     variable=quest_type,
-    values=["Main Quest", "Side Quest"]
+    values=["Main Quest", "Side Quest"],
+    width=160
 )
-quest_type_menu.pack(pady=5)
+quest_type_menu.pack(
+    side="left",
+    padx=5
+)
+
 
 subject = ctk.StringVar(value="Select Subject")
 
 subject_menu = ctk.CTkOptionMenu(
-    window,
+    options_frame,
     variable=subject,
     values=[
         "Mathematics",
@@ -190,32 +443,38 @@ subject_menu = ctk.CTkOptionMenu(
         "Art & Design",
         "Music",
         "Other"
-    ]
+    ],
+    width=180
 )
-subject_menu.pack(pady=5)
+subject_menu.pack(
+    side="left",
+    padx=5
+)
 
-def filter_quests(selected_filter):
-        for quest_card in quest_frame.winfo_children():
 
-            quest_type_value = quest_card.quest_type_value
-            subject_value = quest_card.subject_value
+# FILTER
 
-            if selected_filter == "All":
-                quest_card.pack(fill="x", padx=10, pady=5)
+filter_frame = ctk.CTkFrame(
+    quest_board,
+    fg_color="transparent"
+)
+filter_frame.pack(
+    pady=5
+)
 
-            elif selected_filter == quest_type_value:
-                quest_card.pack(fill="x", padx=10, pady=5)
-
-            elif selected_filter == subject_value:
-                quest_card.pack(fill="x", padx=10, pady=5)
-
-            else:
-                quest_card.pack_forget()
+filter_label = ctk.CTkLabel(
+    filter_frame,
+    text="View:"
+)
+filter_label.pack(
+    side="left",
+    padx=5
+)
 
 filter_choice = ctk.StringVar(value="All")
 
 filter_menu = ctk.CTkOptionMenu(
-    window,
+    filter_frame,
     variable=filter_choice,
     values=[
         "All",
@@ -250,8 +509,10 @@ filter_menu = ctk.CTkOptionMenu(
     ],
     command=filter_quests
 )
-
-filter_menu.pack(pady=5)
+filter_menu.pack(
+    side="left",
+    padx=5
+)
 
 def delete_quest(quest_card , quest_data):
 
@@ -314,7 +575,7 @@ def update_streak():
     last_study_date = today
 
     streak_label.configure(
-    text=f"Streak : {study_streak} "
+    text=f"Streak : {study_streak}"
     )
 
 def show_achievements():
@@ -350,31 +611,31 @@ def show_achievements():
         "badge": "🥉",
         "title": "Rookie Adventurer",
         "description": "Complete your first quest"
-    },
+        },
 
     "Quest Grinder": {
         "badge": "🥈",
         "title": "Quest Grinder",
         "description": "Complete 5 quests"
-    },
+        },
 
     "Getting Serious": {
         "badge": "🥇",
         "title": "Dedicated Adventurer",
         "description": "Complete 10 quests"
-    },
+        },
 
     "XP Hunter": {
         "badge": "💎",
         "title": "XP Hunter",
         "description": "Earn 100 XP"
-    },
+        },
 
     "Level Up!": {
         "badge": "🏆",
         "title": "Rising Hero",
         "description": "Reach Level 2"
-    }
+        }
     }
 
     for achievement, unlocked in achievements.items():
@@ -449,7 +710,7 @@ def show_statistics():
 
     title_label = ctk.CTkLabel(
         statistics_frame,
-        text="Statistics",
+        text="STATISTICS",
         font=("Arial", 24, "bold")
     )
     title_label.pack(pady=15)
@@ -525,22 +786,31 @@ def show_statistics():
     if subject_counts:
 
         most_studied_subject = max(
-            subject_counts,
-            key=subject_counts.get,
-        )   
+        subject_counts,
+        key=subject_counts.get,
+        )
 
-    most_studied_count = subject_counts[most_studied_subject]
+        most_studied_count = subject_counts[most_studied_subject]
 
-    most_studied_label = ctk.CTkLabel(
-        statistics_frame,
-        text=(
-            f"Most Studied Subject : "
-            f"{most_studied_subject} "
-            f"({most_studied_count} quests)"
-        ),
-        font=("Arial", 16, "bold")
-    )
-    most_studied_label.pack(pady=15)
+        most_studied_label = ctk.CTkLabel(
+            statistics_frame,
+            text=(
+                f"Most Studied Subject : "
+                f"{most_studied_subject} "
+                f"({most_studied_count} quests)"
+            ),
+            font=("Arial", 16, "bold")
+        )
+        most_studied_label.pack(pady=15)
+
+    else:
+
+        no_subject_label = ctk.CTkLabel(
+            statistics_frame,
+            text="Most Studied Subject : None yet",
+            font=("Arial", 16, "bold")
+        )
+        no_subject_label.pack(pady=15)
 
 def update_level():
     global level
@@ -580,7 +850,7 @@ def complete_quest(
     selected_quest_type,
     selected_subject,
     quest_data,
- ):
+    ):
     global xp, completed_quests
     global main_quests_completed, side_quests_completed
     global subject_counts
@@ -631,19 +901,9 @@ def complete_quest(
 
     check_achievements()
 
-    quest_label.configure(
-        text="✓ " + quest_label.cget("text"),
-        font=("Arial", 14, "italic", "overstrike")
-    )
+    quest_card = quest_label.master
 
-    complete_button.configure(
-        text="Completed!",
-        state="disabled"
-    )
-
-    delete_button.configure(
-        state="disabled"
-    )
+    quest_card.destroy()
 
     save_progress()
 
@@ -749,6 +1009,9 @@ def add_quest():
     selected_quest_type = quest_type.get()
     selected_subject = subject.get()
 
+    if selected_subject == "Select Subject":
+        return
+
     quest_data = {
         "text": quest_text,
         "difficulty": selected_difficulty,
@@ -767,60 +1030,74 @@ def add_quest():
         quest_data = quest_data
     )
 
-    quest_entry.delete(
-        0,
-        tk.END
-    )
+    quest_entry.delete(0, tk.END)
 
     save_progress()
 
+# ---------- XP PROGRESS ----------
+
+progress_label = ctk.CTkLabel(
+    quest_board,
+    text="XP PROGRESS",
+    font=("Arial", 12, "bold")
+)
+progress_label.pack(
+    pady=(10, 2)
+)
+
 xp_progress = ctk.CTkProgressBar(
-        window,
-        width=400,
-        height=15,
-        fg_color= "grey"
-    )
-xp_progress.pack(pady=10)
+    quest_board,
+    width=500,
+    height=15,
+    fg_color="grey"
+)
+xp_progress.pack(
+    pady=5
+)
 xp_progress.set(0)
 
+
+# ---------- ADD QUEST ----------
+
 add_button = ctk.CTkButton(
-    window,
-    text= "Add Quest",
-    command=add_quest,
+    quest_board,
+    text="+ ADD QUEST",
+    command=lambda: add_quest(),
+    height=40
 )
-add_button.pack()
+add_button.pack(
+    pady=(10, 15)
+)
 
-achievements_button = ctk.CTkButton(
-    window, 
-    text = "Achievements",
-    command = show_achievements,
-)
-achievements_button.pack(pady=5)
+# ---------- QUEST LOG ----------
 
-statistics_button = ctk.CTkButton(
-    window,
-    text="Statistics",
-    command=show_statistics,
+quest_log_frame = ctk.CTkFrame(
+    right_area
 )
-statistics_button.pack(pady=5)
+quest_log_frame.pack(
+    fill="both",
+    expand=True
+)
 
-save_button = ctk.CTkButton(
-    window,
-    text="Save Progress",
-    command=save_progress
+quest_log_title = ctk.CTkLabel(
+    quest_log_frame,
+    text="QUEST LOG",
+    font=("Arial", 18, "bold")
 )
-save_button.pack(pady=5)
+quest_log_title.pack(
+    anchor="w",
+    padx=15,
+    pady=(10, 5)
+)
 
 quest_frame = ctk.CTkScrollableFrame(
-    window,
-    width = 450,
-    height = 250,
+    quest_log_frame
 )
 quest_frame.pack(
-    padx=10,
-    pady=10,
     fill="both",
     expand=True,
+    padx=10,
+    pady=(0, 10)
 )
 
 load_progress()
@@ -841,13 +1118,15 @@ update_level()
 
 for quest_data in quests:
 
-    create_quest_card(
-        quest_data["text"],
-        quest_data["difficulty"],
-        quest_data["quest_type"],
-        quest_data["subject"],
-        quest_data["completed"],
-        quest_data
-    )
+    if not quest_data["completed"]:
+
+        create_quest_card(
+            quest_data["text"],
+            quest_data["difficulty"],
+            quest_data["quest_type"],
+            quest_data["subject"],
+            quest_data["completed"],
+            quest_data
+        )
 
 window.mainloop()
