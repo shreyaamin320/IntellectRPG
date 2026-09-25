@@ -2,6 +2,7 @@ import customtkinter as ctk
 import tkinter as tk
 from datetime import date
 import json
+from PIL import Image
 window = ctk.CTk()
 window.title("IntellectRPG")
 window.geometry("1000x700")
@@ -9,6 +10,30 @@ window.minsize(900, 650)
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
+
+cat_idle_image = ctk.CTkImage(
+    light_image = Image.open("cat_idle.png"),
+    dark_image = Image.open("cat_idle.png"),
+    size = (180, 180)
+)
+
+cat_complete_image = ctk.CTkImage(
+    light_image = Image.open("cat_complete.png"),
+    dark_image = Image.open("cat_complete.png"),
+    size = (180, 180)
+)
+
+cat_achievement_image = ctk.CTkImage(
+    light_image = Image.open("cat_achievement.png"),
+    dark_image = Image.open("cat_achievement.png"),
+    size = (180, 180)
+)
+
+cat_levelup_image = ctk.CTkImage(
+    light_image = Image.open("cat_levelup.png"),
+    dark_image = Image.open("cat_levelup.png"),
+    size = (180, 180)
+)
 
 xp = 0
 level = 1
@@ -239,8 +264,8 @@ cat_frame.pack(
 
 cat_art = ctk.CTkLabel(
     cat_frame,
-    text="🐱⚔️",
-    font=("Arial", 52)
+    text="",
+    image = cat_idle_image
 )
 cat_art.pack(
     pady=(10, 5)
@@ -529,31 +554,65 @@ def xp_required_for_level(level):
 
 def show_level_up(new_level):
     level_up_label.configure(
-        text=f"🎉 LEVEL UP! You reached Level {new_level}! 🎉"
+        text=f"🎉 BRAVO! You reached Level {new_level}! 🎉"
+    )
+
+    cat_art.configure(image=cat_levelup_image)
+    cat_dialogue.configure(
+        text="Getting stronger while grinding, are we?"
     )
 
     window.after(
-        2500,
-        lambda: level_up_label.configure(text="")
+        4000,
+        lambda: (
+            level_up_label.configure(text=""),
+            cat_art.configure(image=cat_idle_image),
+            cat_dialogue.configure(
+                text="Hooman, ready for a quest?"
+            )
+        )
     )
 
 def check_achievements():
     global completed_quests
 
-    if completed_quests >= 1:
+    new_achievement = False
+
+    if completed_quests >= 1 and not achievements["First Quest"]:
         achievements["First Quest"] = True
+        new_achievement = True
 
-    if completed_quests >= 5:
+    if completed_quests >= 5 and not achievements["Quest Grinder"]:
         achievements["Quest Grinder"] = True
+        new_achievement = True
 
-    if completed_quests >= 10:
+    if completed_quests >= 10 and not achievements["Getting Serious"]:
         achievements["Getting Serious"] = True
+        new_achievement = True
 
-    if xp >= 100:
+    if xp >= 100 and not achievements["XP Hunter"]:
         achievements["XP Hunter"] = True
+        new_achievement = True
 
-    if level >= 2:
+    if level >= 2 and not achievements["Level Up!"]:
         achievements["Level Up!"] = True
+        new_achievement = True
+
+    if new_achievement:
+        cat_art.configure(image=cat_achievement_image)
+        cat_dialogue.configure(
+            text="Purrfect! You unlocked shiny things hooman!"
+        )
+
+        window.after(
+            4000,
+            lambda: (
+                cat_art.configure(image=cat_idle_image),
+                cat_dialogue.configure(
+                    text="Hooman, ready for a quest?"
+                )
+            )
+        )
 
 def update_streak():
     global study_streak, last_study_date
@@ -905,6 +964,16 @@ def complete_quest(
 
     quest_card.destroy()
 
+    cat_art.configure(image=cat_complete_image)
+    cat_dialogue.configure(text="YES HOOMAN! Quest complete! Keep going!")
+    window.after(
+        4000,
+        lambda: (
+        cat_art.configure(image=cat_idle_image),
+        cat_dialogue.configure(text="Hooman, ready for a quest?")
+        )
+    )
+
     save_progress()
 
 def create_quest_card(
@@ -1034,7 +1103,7 @@ def add_quest():
 
     save_progress()
 
-# ---------- XP PROGRESS ----------
+# XP PROGRESS
 
 progress_label = ctk.CTkLabel(
     quest_board,
@@ -1057,7 +1126,7 @@ xp_progress.pack(
 xp_progress.set(0)
 
 
-# ---------- ADD QUEST ----------
+# ADD QUEST
 
 add_button = ctk.CTkButton(
     quest_board,
@@ -1069,7 +1138,7 @@ add_button.pack(
     pady=(10, 15)
 )
 
-# ---------- QUEST LOG ----------
+# QUEST LOG
 
 quest_log_frame = ctk.CTkFrame(
     right_area
@@ -1128,5 +1197,5 @@ for quest_data in quests:
             quest_data["completed"],
             quest_data
         )
-
+        
 window.mainloop()
