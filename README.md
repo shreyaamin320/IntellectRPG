@@ -1,6 +1,6 @@
 # IntellectRPG 
 
-A gamified study tracker built with Python and Tkinter.
+A gamified study tracker built with Python, CustomTkinter and Tkinter.
 
 ## Project Status
 
@@ -12,7 +12,7 @@ This project is being built from scratch as part of the FirstCommit hackathon.
 
 IntellectRPG aims to turn studying and productivity into an RPG-style experience.
 
-Users can create quests, complete them, earn XP, level up, unlock achievements, maintain study streaks, and track their progress — while being accompanied by a supportive knight cat. 
+Users can create quests, complete them, earn XP, level up, unlock achievements, maintain study streaks, and track their progress — while being accompanied by a supportive orange cat. 
 
 The goal is to make studying feel more rewarding, motivating, and fun.
 
@@ -32,7 +32,7 @@ The goal is to make studying feel more rewarding, motivating, and fun.
 - [x] Level system
 - [x] Difficulty system
 - [x] Progress tracking
-- [ ] UI polish
+- [x] UI polish
 
 ## Planned Features
 
@@ -54,15 +54,15 @@ The goal is to make studying feel more rewarding, motivating, and fun.
 - [x] Better study-focused quest organization
 - [x] Save and load progress
 
-### Knight Cat Companion
-- [ ] Knight cat companion
-- [ ] Cat reactions to user progress
-- [ ] Motivational cat dialogue
+### Cat Companion (Crookshanks)
+- [x] Cat companion
+- [x] Cat reactions to user progress
+- [x] Motivational cat dialogue
 - [ ] Treat reward system for the cat
 - [ ] Cat-related achievements and rewards
 
 ### UI & Experience
-- [ ] Improved dashboard
+- [x] Improved dashboard
 - [ ] More polished visual design
 - [ ] Level-up animations/popups
 - [ ] More interactive RPG elements
