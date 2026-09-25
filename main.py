@@ -38,6 +38,8 @@ cat_levelup_image = ctk.CTkImage(
 xp = 0
 level = 1
 
+treats = 0
+
 completed_quests = 0
 achievement_window = None
 
@@ -74,6 +76,7 @@ def save_progress():
         ),
         "achievements" : achievements,
         "quests" : quests,
+        "treats" : treats
     }
 
     with open("save_data.json" , "w") as file:
@@ -83,6 +86,7 @@ def load_progress():
 
     global xp, level
     global completed_quests
+    global treats
     global main_quests_completed, side_quests_completed
     global subject_counts
     global study_streak, last_study_date
@@ -98,6 +102,8 @@ def load_progress():
         level = data.get("level", 1)
 
         completed_quests = data.get( "completed_quests", 0)
+
+        treats = data.get("treats" , 0)
 
         main_quests_completed = data.get("main_quests_completed", 0)
 
@@ -303,8 +309,8 @@ cat_dialogue.pack(
 
 cat_treats = ctk.CTkLabel(
     cat_frame,
-    text="Treats: 0",
-    font=("Arial", 13, "bold")
+    text= f"Treats : {treats}",
+    font=("Arial", 13, "bold"),
 )
 cat_treats.pack(
     pady=5
@@ -474,6 +480,26 @@ subject_menu = ctk.CTkOptionMenu(
 subject_menu.pack(
     side="left",
     padx=5
+)
+
+other_subject_entry = ctk.CTkEntry(
+    options_frame,
+    width=180,
+    placeholder_text="Enter subject..."
+)
+
+def subject_changed(selected_subject):
+    if selected_subject == "Other":
+        other_subject_entry.pack(
+            side="left",
+            padx=5
+        )
+    else:
+        other_subject_entry.pack_forget()
+        other_subject_entry.delete(0, tk.END)
+
+subject_menu.configure(
+    command=subject_changed
 )
 
 
@@ -911,6 +937,7 @@ def complete_quest(
     quest_data,
     ):
     global xp, completed_quests
+    global treats
     global main_quests_completed, side_quests_completed
     global subject_counts
 
@@ -947,6 +974,12 @@ def complete_quest(
     elif selected_quest_type == "Side Quest":
         side_quests_completed += 1
 
+    if selected_quest_type == "Main Quest":
+        treats += 2
+    elif selected_quest_type == "Side Quest":
+        treats += 1
+    cat_treats.configure(text=f"Treats : {treats}")
+
     if selected_subject not in subject_counts:
         subject_counts[selected_subject] = 0
 
@@ -965,7 +998,7 @@ def complete_quest(
     quest_card.destroy()
 
     cat_art.configure(image=cat_complete_image)
-    cat_dialogue.configure(text="YES HOOMAN! Quest complete! Keep going!")
+    cat_dialogue.configure(text="Keep going hooman! More treats for me to come!")
     window.after(
         4000,
         lambda: (
@@ -1081,6 +1114,19 @@ def add_quest():
     if selected_subject == "Select Subject":
         return
 
+    if selected_subject == "Other":
+        selected_subject = other_subject_entry.get().strip()
+
+    if selected_subject == "":
+        return
+
+    filter_values = filter_menu.cget("values")
+
+    if selected_subject not in filter_values:
+        filter_menu.configure(
+            values=list(filter_values) + [selected_subject]
+        )
+
     quest_data = {
         "text": quest_text,
         "difficulty": selected_difficulty,
@@ -1102,6 +1148,10 @@ def add_quest():
     quest_entry.delete(0, tk.END)
 
     save_progress()
+
+    subject.set("Select Subject")
+    other_subject_entry.pack_forget()
+    other_subject_entry.delete(0, tk.END)
 
 # XP PROGRESS
 
