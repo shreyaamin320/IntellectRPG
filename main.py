@@ -35,6 +35,18 @@ cat_levelup_image = ctk.CTkImage(
     size = (180, 180)
 )
 
+cat_eating_image = ctk.CTkImage(
+    light_image=Image.open("cat_eating.png"),
+    dark_image=Image.open("cat_eating.png"),
+    size=(180, 180)
+)
+
+cat_sad_image = ctk.CTkImage(
+    light_image=Image.open("cat_sad.png"),
+    dark_image=Image.open("cat_sad.png"),
+    size=(180, 180)
+)
+
 xp = 0
 level = 1
 
@@ -172,7 +184,7 @@ header_frame.pack(
 
 title_label = ctk.CTkLabel(
     header_frame,
-    text="INTELLECTRPG",
+    text="IntellectRPG",
     font=("Arial", 24, "bold")
 )
 title_label.pack(
@@ -316,6 +328,54 @@ cat_treats.pack(
     pady=5
 )
 
+def feed_cat():
+    global treats
+
+    if treats <= 0:
+
+        cat_art.configure(
+            image=cat_sad_image
+        )
+
+        cat_dialogue.configure(
+            text="Hooman... where are my treats?"
+        )
+
+        return
+
+    treats -= 1
+
+    cat_treats.configure(
+        text=f"Treats : {treats}"
+    )
+
+    cat_art.configure(
+        image=cat_eating_image
+    )
+
+    cat_dialogue.configure(
+        text="CHOMP CHOMP CHOMP More treats, hooman!"
+    )
+
+    save_progress()
+
+    window.after(
+        3000,
+        lambda: (
+            cat_art.configure(image=cat_idle_image),
+            cat_dialogue.configure(
+                text="Hooman, ready for a quest?"
+            )
+        )
+    )
+
+feed_button = ctk.CTkButton(
+    cat_frame,
+    text="Feed Crookshanks",
+    command=feed_cat
+)
+feed_button.pack(pady=5)
+
 sidebar_separator = ctk.CTkFrame(
     sidebar_frame,
     height=2
@@ -334,7 +394,7 @@ achievements_button = ctk.CTkButton(
 achievements_button.pack(
     fill="x",
     padx=20,
-    pady=5
+    pady=3
 )
 
 statistics_button = ctk.CTkButton(
@@ -345,7 +405,7 @@ statistics_button = ctk.CTkButton(
 statistics_button.pack(
     fill="x",
     padx=20,
-    pady=5
+    pady=3
 )
 
 save_button = ctk.CTkButton(
@@ -356,7 +416,7 @@ save_button = ctk.CTkButton(
 save_button.pack(
     fill="x",
     padx=20,
-    pady=5
+    pady=3
 )
 
 
@@ -578,6 +638,35 @@ def delete_quest(quest_card , quest_data):
 def xp_required_for_level(level):
     return 100 * level * (level - 1) // 2
 
+def update_level():
+    global level
+
+    old_level = level
+
+    new_level = 1
+
+    while xp >= xp_required_for_level(new_level + 1):
+        new_level += 1
+
+    level = new_level
+
+    current_level_xp = xp_required_for_level(level)
+    next_level_xp = xp_required_for_level(level + 1)
+
+    xp_in_current_level = xp - current_level_xp
+    xp_needed_for_level = next_level_xp - current_level_xp
+
+    progress = xp_in_current_level / xp_needed_for_level
+
+    xp_progress.set(progress)
+
+    level_label.configure(
+        text=f"Level : {level}"
+    )
+
+    if level > old_level:
+        show_level_up(level)
+
 def show_level_up(new_level):
     level_up_label.configure(
         text=f"🎉 BRAVO! You reached Level {new_level}! 🎉"
@@ -725,28 +814,50 @@ def show_achievements():
 
     for achievement, unlocked in achievements.items():
 
-        badge = achievement_details [achievement] ["badge"]
-        title = achievement_details [achievement] ["title"]
-        description = achievement_details [achievement] ["description"]
+        badge = achievement_details[achievement]["badge"]
+        title = achievement_details[achievement]["title"]
+        description = achievement_details[achievement]["description"]
 
         achievement_card = ctk.CTkFrame(
             achievement_frame
         )
         achievement_card.pack(
             fill="x",
-            padx=20,
+            padx=10,
             pady=6
         )
 
-        name_label = ctk.CTkLabel(
+        top_row = ctk.CTkFrame(
             achievement_card,
+            fg_color="transparent"
+        )
+        top_row.pack(
+            fill="x",
+            padx=15,
+            pady=(10, 2)
+        )
+
+        name_label = ctk.CTkLabel(
+            top_row,
             text=f"{badge} {title}",
             font=("Arial", 16, "bold")
         )
         name_label.pack(
-            anchor="w",
-            padx=15,
-            pady=(10, 2)
+            side="left"
+        )
+
+        if unlocked:
+            status_text = "✓ UNLOCKED"
+        else:
+            status_text = "🔒 LOCKED"
+
+        status_label = ctk.CTkLabel(
+            top_row,
+            text=status_text,
+            font=("Arial", 12, "bold")
+        )
+        status_label.pack(
+            side="right"
         )
 
         description_label = ctk.CTkLabel(
@@ -756,23 +867,8 @@ def show_achievements():
         )
         description_label.pack(
             anchor="w",
-            padx=15
-        )
-
-        if unlocked:
-            status_text = "✓ UNLOCKED"
-        else:
-            status_text = "🔒 LOCKED"
-
-        status_label = ctk.CTkLabel(
-            achievement_card,
-            text=status_text,
-            font=("Arial", 12, "bold")
-        )
-        status_label.pack(
-            anchor="e",
             padx=15,
-            pady=(2, 10)
+            pady=(0, 10)
         )
 
 def show_statistics():
@@ -793,89 +889,130 @@ def show_statistics():
         expand=True
     )
 
+    # TITLE
+
     title_label = ctk.CTkLabel(
         statistics_frame,
         text="STATISTICS",
         font=("Arial", 24, "bold")
     )
-    title_label.pack(pady=15)
+    title_label.pack(pady=(15, 20))
+
+    # GENERAL PROGRESS
+
+    progress_title = ctk.CTkLabel(
+        statistics_frame,
+        text="Progress",
+        font=("Arial", 18, "bold")
+    )
+    progress_title.pack(pady=(5, 10))
+
 
     total_quests_label = ctk.CTkLabel(
         statistics_frame,
         text=f"Total Quests Completed : {completed_quests}",
         font=("Arial", 16)
     )
-    total_quests_label.pack(pady=8)
+    total_quests_label.pack(pady=6)
+
 
     total_xp_label = ctk.CTkLabel(
         statistics_frame,
         text=f"Total XP Earned : {xp}",
         font=("Arial", 16)
     )
-    total_xp_label.pack(pady=8)
+    total_xp_label.pack(pady=6)
+
 
     level_stats_label = ctk.CTkLabel(
         statistics_frame,
         text=f"Current Level : {level}",
         font=("Arial", 16)
     )
-    level_stats_label.pack(pady=8)
+    level_stats_label.pack(pady=6)
+
 
     streak_stats_label = ctk.CTkLabel(
         statistics_frame,
         text=f"Current Streak : {study_streak} days",
         font=("Arial", 16)
     )
-    streak_stats_label.pack(pady=8)
+    streak_stats_label.pack(pady=6)
+
+    # QUEST BREAKDOWN
+
+    quest_title = ctk.CTkLabel(
+        statistics_frame,
+        text="Quest Breakdown",
+        font=("Arial", 18, "bold")
+    )
+    quest_title.pack(pady=(20, 10))
+
 
     main_quest_label = ctk.CTkLabel(
         statistics_frame,
         text=f"Main Quests : {main_quests_completed}",
         font=("Arial", 16)
     )
-    main_quest_label.pack(pady=8)
+    main_quest_label.pack(pady=6)
+
 
     side_quest_label = ctk.CTkLabel(
         statistics_frame,
         text=f"Side Quests : {side_quests_completed}",
         font=("Arial", 16)
     )
-    side_quest_label.pack(pady=8)
+    side_quest_label.pack(pady=6)
+
+    # CROOKSHANKS
+
+    companion_title = ctk.CTkLabel(
+        statistics_frame,
+        text="Crookshanks",
+        font=("Arial", 18, "bold")
+    )
+    companion_title.pack(pady=(20, 10))
+
+
+    treats_stats_label = ctk.CTkLabel(
+        statistics_frame,
+        text=f"Treats : {treats}",
+        font=("Arial", 16)
+    )
+    treats_stats_label.pack(pady=6)
+
+    # SUBJECT ACTIVITY
+
 
     subject_title = ctk.CTkLabel(
         statistics_frame,
         text="Subject Activity",
         font=("Arial", 18, "bold")
     )
-    subject_title.pack(pady=15)
+    subject_title.pack(pady=(20, 10))
+
 
     if subject_counts:
 
         for subject_name, count in subject_counts.items():
 
             subject_label = ctk.CTkLabel(
-            statistics_frame,
-            text=f"{subject_name} : {count} quests",
-            font=("Arial", 14),
+                statistics_frame,
+                text=f"{subject_name} : {count} quests",
+                font=("Arial", 14)
             )
             subject_label.pack(pady=3)
 
-    else:
-        no_subjects_label = ctk.CTkLabel(
-            statistics_frame,
-            text="No completed quests yet.",
-            font=("Arial", 14),
-        )
-        no_subjects_label.pack(pady=5)
-
-    if subject_counts:
 
         most_studied_subject = max(
-        subject_counts,
-        key=subject_counts.get,
+            subject_counts,
+            key=subject_counts.get
         )
 
-        most_studied_count = subject_counts[most_studied_subject]
+        most_studied_count = subject_counts[
+            most_studied_subject
+        ]
+
 
         most_studied_label = ctk.CTkLabel(
             statistics_frame,
@@ -888,7 +1025,16 @@ def show_statistics():
         )
         most_studied_label.pack(pady=15)
 
+
     else:
+
+        no_subjects_label = ctk.CTkLabel(
+            statistics_frame,
+            text="No completed quests yet.",
+            font=("Arial", 14)
+        )
+        no_subjects_label.pack(pady=5)
+
 
         no_subject_label = ctk.CTkLabel(
             statistics_frame,
@@ -896,35 +1042,6 @@ def show_statistics():
             font=("Arial", 16, "bold")
         )
         no_subject_label.pack(pady=15)
-
-def update_level():
-    global level
-
-    old_level = level
-
-    new_level = 1
-
-    while xp >= xp_required_for_level(new_level + 1):
-        new_level += 1
-
-    level = new_level
-
-    current_level_xp = xp_required_for_level(level)
-    next_level_xp = xp_required_for_level(level + 1)
-
-    xp_in_current_level = xp - current_level_xp
-    xp_needed_for_level = next_level_xp - current_level_xp
-
-    progress = xp_in_current_level / xp_needed_for_level
-
-    xp_progress.set(progress)
-
-    level_label.configure(
-        text=f"Level : {level}"
-    )
-
-    if level > old_level:
-        show_level_up(level)
     
 
 def complete_quest(
@@ -1167,7 +1284,7 @@ progress_label.pack(
 xp_progress = ctk.CTkProgressBar(
     quest_board,
     width=500,
-    height=15,
+    height=17,
     fg_color="grey"
 )
 xp_progress.pack(
