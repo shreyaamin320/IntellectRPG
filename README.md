@@ -43,6 +43,17 @@ The goal is to make studying feel more rewarding, motivating, and fun.
 
 The IntellectRPG desktop application will open in a new window.
 
+## Screenshots
+
+### Main Dashboard
+![Main Dashboard](screenshots/main_screen.png)
+
+### Statistics
+![Statistics](screenshots/statistics.png)
+
+### Achievements
+![Achievements](screenshots/achievement.png)
+
 ## Save Data
 
 IntellectRPG automatically saves user progress in `save_data.json`.
